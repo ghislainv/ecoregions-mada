@@ -12,8 +12,18 @@ require(ggplot2)
 require(rasterVis)
 require(rgdal)
 require(ggspatial)  # for layer_spatial()
-require(svglite) # to export as svg
+require(svglite)  # to export as svg
 require(sf)
+require(dataverse)
+
+## Env. variables
+Sys.setenv("DATAVERSE_SERVER"="dataverse.cirad.fr")
+
+## Load raster data from Cirad dataverse
+ds_doi <- "doi:10.18167/DVN1/AUBRRC"
+(dataset <- get_dataset(ds_doi))
+writeBin(get_file("for2015.tif", ds_doi), "gisdata/rasters/for2015.tif")
+writeBin(get_file("for2017.tif", ds_doi), "gisdata/rasters/for2017.tif")
 
 ## Import
 ecoregion <- readOGR(dsn="gisdata/vectors",layer="madagascar_ecoregion_tenaizy_38s")
@@ -58,7 +68,7 @@ black.t <- adjustcolor("black",alpha.f=0.5)
 eco.col <- c("h"=green.t,"d"=orange.t,"s"=red.t,"m"="blue","1"=black.t)
 
 ## Plot
-plot.ecoregion <- gplot(for2015, maxpixels=1e5) +
+plot.ecoregion <- gplot(for2015, maxpixels=1e6) +
   layer_spatial(mapping=aes(group=code, fill=factor(code)), data=ecoregion) +
   geom_raster(aes(fill=factor(value))) +
   scale_fill_manual(values=eco.col, na.value="transparent") +
@@ -71,3 +81,5 @@ plot.ecoregion <- gplot(for2015, maxpixels=1e5) +
   coord_equal() + coord_sf(datum=st_crs(32738))
 ggsave("ecoregion.png", plot.ecoregion, width=10, height=15, units="cm")
 ggsave("ecoregion.svg", plot.ecoregion, width=10, height=15, units="cm")
+
+# EOF
