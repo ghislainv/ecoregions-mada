@@ -22,8 +22,14 @@ Sys.setenv("DATAVERSE_SERVER"="dataverse.cirad.fr")
 ## Load raster data from Cirad dataverse
 ds_doi <- "doi:10.18167/DVN1/AUBRRC"
 (dataset <- get_dataset(ds_doi))
-writeBin(get_file("for2015.tif", ds_doi), "gisdata/rasters/for2015.tif")
-writeBin(get_file("for2017.tif", ds_doi), "gisdata/rasters/for2017.tif")
+f <- "gisdata/rasters/for2015.tif"
+if (!file.exists(f)) {
+    writeBin(get_file("for2015.tif", ds_doi), f)
+}
+f <- "gisdata/rasters/for2017.tif"
+if (!file.exists(f)) {
+    writeBin(get_file("for2017.tif", ds_doi), f)
+}
 
 ## Import
 ecoregion <- readOGR(dsn="gisdata/vectors",layer="madagascar_ecoregion_tenaizy_38s")
@@ -80,6 +86,5 @@ plot.ecoregion <- gplot(for2015, maxpixels=1e6) +
   scale_x_continuous(limits=c(300000,1100000),expand=c(0,0)) +
   coord_equal() + coord_sf(datum=st_crs(32738))
 ggsave("ecoregion.png", plot.ecoregion, width=10, height=15, units="cm")
-ggsave("ecoregion.svg", plot.ecoregion, width=10, height=15, units="cm")
 
 # EOF
